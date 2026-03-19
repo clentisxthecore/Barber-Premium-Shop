@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Best Barber Premium | Experiência</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Bibliotecas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --gold: #C9A84C;
+            --dark: #0A0806;
+            --text: #F5ECD7;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--dark);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            outline: none;
+            z-index: 1;
+        }
+
+        /* Seções de Scroll */
+        section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            z-index: 2;
+            pointer-events: none; /* Permite rolar através do texto */
+        }
+
+        .content {
+            max-width: 500px;
+            opacity: 0;
+            transform: translateY(50px);
+            pointer-events: all;
+        }
+
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            margin: 0;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(245, 236, 215, 0.8);
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 40px;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        /* Posicionamento das Etapas */
+        #step-3 { justify-content: flex-end; }
+        #step-5 { justify-content: center; text-align: center; }
+
+        /* Barra de Progresso */
+        .loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--gold);
+            transform: scaleX(0);
+            transform-origin: left;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loader"></div>
+    <canvas id="webgl"></canvas>
+
+    <!-- Contexto de Scroll -->
+    <section id="step-1">
+        <div class="content">
+            <h1>A Arte da Seleção</h1>
+            <p>Toda obra-prima começa com uma visão. Nossos mestres barbeiros analisam seu perfil para criar uma silhueta que define seu caráter.</p>
+        </div>
+    </section>
+
+    <section id="step-2">
+        <div class="content">
+            <h2>Movimento de Precisão</h2>
+            <p>Trabalhamos com acurácia cirúrgica. Usamos as melhores ferramentas do mercado para esculpir texturas que refletem a luz de todos os ângulos.</p>
+        </div>
+    </section>
+
+    <section id="step-3">
+        <div class="content">
+            <h2>O Degradê Perfeito</h2>
+            <p>Uma transição perfeita. Nossa perspectiva de topo garante uma simetria que impõe respeito de qualquer ponto de vista.</p>
+        </div>
+    </section>
+
+    <section id="step-4">
+        <div class="content">
+            <h2>Detalhes Afiados</h2>
+            <p>A diferença está no milímetro. Linhas nítidas, bordas limpas e o acabamento premium que é nossa assinatura.</p>
+        </div>
+    </section>
+
+    <section id="step-5">
+        <div class="content">
+            <h1>A Obra-Prima</h1>
+            <p>Experimente o padrão máximo de cuidados masculinos.</p>
+            <a href="#" class="cta-button">RESERVE SUA CADEIRA</a>
+        </div>
+    </section>
+
+    <script>
+        // 1. CONFIGURAÇÃO DA CENA
+        const canvas = document.querySelector('#webgl');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // 2. OBJETOS DE MARCAÇÃO (Substitua pelos seus modelos .glb)
+        const barberGroup = new THREE.Group();
+        scene.add(barberGroup);
+
+        const headGeometry = new THREE.IcosahedronGeometry(1.5, 0); // Estilo low-poly chic
+        const headMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1410, 
+            roughness: 0.3, 
+            metalness: 0.8 
+        });
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        barberGroup.add(head);
+
+        // Adiciona um aro dourado para visualizar a rotação
+        const crownGeo = new THREE.TorusGeometry(1, 0.05, 16, 100);
+        const goldMat = new THREE.MeshStandardMaterial({ color: 0xC9A84C, metalness: 1, roughness: 0.2 });
+        const crown = new THREE.Mesh(crownGeo, goldMat);
+        crown.rotation.x = Math.PI / 2;
+        crown.position.y = 0.5;
+        barberGroup.add(crown);
+
+        // 3. ILUMINAÇÃO
+        const mainLight = new THREE.PointLight(0xffffff, 2);
+        mainLight.position.set(5, 5, 5);
+        scene.add(mainLight);
+
+        const goldLight = new THREE.SpotLight(0xC9A84C, 5);
+        goldLight.position.set(-5, 2, 2);
+        scene.add(goldLight);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        camera.position.z = 6;
+
+        // 4. LÓGICA DE ANIMAÇÃO GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1, // Suavização cinematográfica
+            }
+        });
+
+        // PASSO 1 para 2: Rotação 45 graus + Zoom
+        tl.to(barberGroup.rotation, { y: Math.PI * 0.25, ease: "none" }, 0)
+          .to(camera.position, { z: 5, ease: "none" }, 0)
+          .to("#step-1 .content", { opacity: 1, y: 0 }, 0)
+          .to("#step-1 .content", { opacity: 0, y: -50 }, 0.2);
+
+        // PASSO 2 para 3: Ângulo de Topo (Fade)
+        tl.to(barberGroup.rotation, { x: 0.8, y: Math.PI * 0.5 }, 0.3)
+          .to(camera.position, { y: 2, z: 4 }, 0.3)
+          .to("#step-2 .content", { opacity: 1, y: 0 }, 0.25)
+          .to("#step-2 .content", { opacity: 0, y: -50 }, 0.45);
+
+        // PASSO 3 para 4: Close-up nos Detalhes
+        tl.to(camera.position, { x: 1, y: 0.5, z: 2.5 }, 0.5)
+          .to(barberGroup.rotation, { x: 0.1, y: Math.PI * 0.8 }, 0.5)
+          .to("#step-3 .content", { opacity: 1, y: 0 }, 0.5)
+          .to("#step-3 .content", { opacity: 0, y: -50 }, 0.7);
+
+        // PASSO 4 para 5: Revelação Final (Zoom out + Brilho)
+        tl.to(camera.position, { x: 0, y: 0, z: 7 }, 0.8)
+          .to(barberGroup.rotation, { x: 0, y: Math.PI * 2 }, 0.8)
+          .to(goldLight, { intensity: 15 }, 0.8)
+          .to("#step-4 .content", { opacity: 1, y: 0 }, 0.75)
+          .to("#step-4 .content", { opacity: 0, y: -50 }, 0.9)
+          .to("#step-5 .content", { opacity: 1, y: 0 }, 0.95);
+
+        // Atualização da Barra de Progresso
+        gsap.to(".loader", {
+            scaleX: 1,
+            ease: "none",
+            scrollTrigger: { scrub: 0.3 }
+        });
+
+        // 5. LOOP DE RENDERIZAÇÃO
+        const clock = new THREE.Clock();
+
+        function animate() {
+            const elapsedTime = clock.getElapsedTime();
+
+            // Movimento sutil de "respiração" (Idle)
+            barberGroup.position.y = Math.sin(elapsedTime * 0.5) * 0.1;
+            
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Ajuste de Janela (Responsive)
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
